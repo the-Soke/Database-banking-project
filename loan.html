@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Loan Simulator</title>
+
+<style>
+:root {
+    --bg: #0b0f1a;
+    --card: #11162a;
+    --blue: #1f6fff;
+    --blue-soft: #2a86ff;
+    --text: #e6ebff;
+    --muted: #8b93b8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+}
+
+.subtitle {
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #1e2547;
+    background: #0c1228;
+    color: var(--text);
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.95;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.summary-box {
+    background: #0c1228;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.summary-box span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.summary-box strong {
+    font-size: 20px;
+    margin-top: 4px;
+    display: block;
+}
+
+table {
+    width: 100%;
+    margin-top: 32px;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: right;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 12px 8px;
+    border-bottom: 1px solid #1e2547;
+}
+
+td {
+    padding: 10px 8px;
+    text-align: right;
+    border-bottom: 1px solid #161c3b;
+    font-size: 14px;
+}
+
+th:first-child,
+td:first-child {
+    text-align: left;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Loans</h1>
+        <div class="subtitle">Simulate repayments before issuing a loan</div>
+
+        <div class="grid">
+            <div>
+                <label>Loan Amount</label>
+                <input type="number" id="amount" min="1">
+            </div>
+            <div>
+                <label>Interest Rate (% yearly)</label>
+                <input type="number" id="rate" min="0.01" step="0.01">
+            </div>
+            <div>
+                <label>Duration (months)</label>
+                <input type="number" id="months" min="1">
+            </div>
+        </div>
+
+        <button onclick="simulate()">Simulate Loan</button>
+
+        <div id="summary" class="summary"></div>
+
+        <table id="table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Payment</th>
+                    <th>Principal</th>
+                    <th>Interest</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function simulate() {
+    const amount = +amountInput.value;
+    const rate = (+rateInput.value / 100) / 12;
+    const months = +monthsInput.value;
+
+    if (!amount || !rate || !months) return;
+
+    const payment = amount * rate / (1 - Math.pow(1 + rate, -months));
+    let balance = amount;
+    let totalInterest = 0;
+
+    summary.innerHTML = `
+        <div class="summary-box">
+            <span>Monthly Payment</span>
+            <strong>${payment.toFixed(2)}</strong>
+        </div>
+        <div class="summary-box">
+            <span>Total Interest</span>
+            <strong>${(payment * months - amount).toFixed(2)}</strong>
+        </div>
+        <div class="summary-box">
+            <span>Total Repayment</span>
+            <strong>${(payment * months).toFixed(2)}</strong>
+        </div>
+    `;
+
+    const tbody = document.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    for (let i = 1; i <= months; i++) {
+        const interest = balance * rate;
+        const principal = payment - interest;
+        balance -= principal;
+        totalInterest += interest;
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${i}</td>
+                <td>${payment.toFixed(2)}</td>
+                <td>${principal.toFixed(2)}</td>
+                <td>${interest.toFixed(2)}</td>
+                <td>${Math.max(balance, 0).toFixed(2)}</td>
+            </tr>
+        `;
+    }
+
+    table.style.display = "table";
+}
+
+const amountInput = document.getElementById("amount");
+const rateInput = document.getElementById("rate");
+const monthsInput = document.getElementById("months");
+const summary = document.getElementById("summary");
+const table = document.getElementById("table");
+</script>
+
+</body>
+</html>
