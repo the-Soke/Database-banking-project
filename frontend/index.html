@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Banking Dashboard</title>
+
+<style>
+:root {
+    --bg:#0b0f1a;
+    --card:#11162a;
+    --panel:#0c1228;
+    --blue:#1f6fff;
+    --blue-soft:#2a86ff;
+    --text:#e6ebff;
+    --muted:#8b93b8;
+    --success:#22c55e;
+    --error:#ef4444;
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+    padding:24px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.welcome-text{
+    font-size:24px;
+    font-weight:700;
+}
+
+.logout-btn{
+    padding:10px 20px;
+    background:#1a2145;
+    border:none;
+    border-radius:12px;
+    color:var(--text);
+    cursor:pointer;
+    font-weight:600;
+}
+
+.logout-btn:hover{
+    background:#252d50;
+}
+
+/* BALANCE CARD */
+.balance-card{
+    background:var(--card);
+    padding:28px;
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,.45);
+    margin-bottom:24px;
+}
+
+.balance-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.balance-title{
+    font-size:14px;
+    color:var(--muted);
+}
+
+.account-selector{
+    padding:8px 12px;
+    background:var(--panel);
+    border:1px solid #1e2547;
+    border-radius:10px;
+    color:var(--text);
+    font-size:13px;
+    cursor:pointer;
+}
+
+.eye{
+    cursor:pointer;
+    font-size:18px;
+    color:var(--muted);
+}
+
+.balance-amount{
+    font-size:36px;
+    font-weight:700;
+    margin:16px 0 24px;
+}
+
+.actions{
+    display:flex;
+    gap:12px;
+}
+
+button{
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--blue),var(--blue-soft));
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    flex:1;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+button.secondary{
+    background:#1a2145;
+}
+
+button.secondary:hover{
+    background:#252d50;
+}
+
+/* ACTION GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:28px;
+}
+
+.grid-item{
+    background:var(--card);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    cursor:pointer;
+    transition:transform 0.2s;
+}
+
+.grid-item:hover{
+    transform:translateY(-4px);
+}
+
+.icon{
+    font-size:26px;
+    margin-bottom:8px;
+    color:var(--blue-soft);
+}
+
+.grid-label{
+    font-size:14px;
+}
+
+/* RECENT TRANSACTIONS */
+.section-title{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:16px;
+}
+
+.transactions-list{
+    background:var(--card);
+    border-radius:18px;
+    padding:20px;
+}
+
+.transaction-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 0;
+    border-bottom:1px solid #1a2145;
+}
+
+.transaction-item:last-child{
+    border-bottom:none;
+}
+
+.transaction-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.transaction-icon{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.transaction-icon.deposit{
+    background:rgba(34,197,94,0.1);
+    color:var(--success);
+}
+
+.transaction-icon.withdrawal{
+    background:rgba(239,68,68,0.1);
+    color:var(--error);
+}
+
+.transaction-icon.transfer{
+    background:rgba(31,111,255,0.1);
+    color:var(--blue-soft);
+}
+
+.transaction-details h4{
+    margin:0 0 4px;
+    font-size:14px;
+}
+
+.transaction-details p{
+    margin:0;
+    font-size:12px;
+    color:var(--muted);
+}
+
+.transaction-amount{
+    font-weight:700;
+    font-size:16px;
+}
+
+.transaction-amount.positive{
+    color:var(--success);
+}
+
+.transaction-amount.negative{
+    color:var(--error);
+}
+
+/* MODALS */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+}
+
+.overlay.active{
+    display:flex;
+}
+
+.modal{
+    background:var(--card);
+    padding:24px;
+    border-radius:18px;
+    width:100%;
+    max-width:400px;
+}
+
+.modal h3{
+    margin:0 0 20px;
+    font-size:20px;
+}
+
+label{
+    font-size:13px;
+    color:var(--muted);
+    display:block;
+    margin-bottom:6px;
+}
+
+input,select{
+    width:100%;
+    padding:14px;
+    margin-bottom:16px;
+    border-radius:12px;
+    border:1px solid #1e2547;
+    background:var(--panel);
+    color:var(--text);
+    font-size:14px;
+}
+
+input:focus,select:focus{
+    outline:none;
+    border-color:var(--blue);
+}
+
+.modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.success-modal{
+    text-align:center;
+}
+
+.success-icon{
+    font-size:48px;
+    margin-bottom:16px;
+}
+
+.success-icon.success{
+    color:var(--success);
+}
+
+.success-icon.error{
+    color:var(--error);
+}
+
+.error-message{
+    color:var(--error);
+    font-size:13px;
+    margin-top:8px;
+}
+
+.loading{
+    display:inline-block;
+    width:20px;
+    height:20px;
+    border:3px solid rgba(255,255,255,0.3);
+    border-radius:50%;
+    border-top-color:white;
+    animation:spin 0.8s linear infinite;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="welcome-text">Welcome, <span id="userName">User</span></div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- BALANCE CARD -->
+    <div class="balance-card">
+        <div class="balance-header">
+            <div class="balance-title">Available Balance</div>
+            <select class="account-selector" id="accountSelector" onchange="switchAccount()">
+                <option value="">Select Account</option>
+            </select>
+        </div>
+
+        <div class="balance-amount" id="balance">₦0.00</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px;" id="accountType">Savings Account</div>
+
+        <div class="actions">
+            <button onclick="openModal('deposit')">💰 Deposit</button>
+            <button class="secondary" onclick="openModal('withdraw')">💸 Withdraw</button>
+            <button class="secondary" onclick="openModal('transfer')">🔄 Transfer</button>
+        </div>
+    </div>
+
+    <!-- ACTION GRID -->
+    <div class="grid">
+        <div class="grid-item" onclick="openModal('createAccount')">
+            <div class="icon">➕</div>
+            <div class="grid-label">New Account</div>
+        </div>
+        <div class="grid-item" onclick="location.href='loan.html'">
+            <div class="icon">💳</div>
+            <div class="grid-label">Loans</div>
+        </div>
+        <div class="grid-item" onclick="loadTransactions()">
+            <div class="icon">📊</div>
+            <div class="grid-label">Transactions</div>
+        </div>
+        <div class="grid-item">
+            <div class="icon">👤</div>
+            <div class="grid-label">Profile</div>
+        </div>
+        <div class="grid-item">
+            <div class="icon">⚙️</div>
+            <div class="grid-label">Settings</div>
+        </div>
+        <div class="grid-item">
+            <div class="icon">❓</div>
+            <div class="grid-label">Help</div>
+        </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="section-title">Recent Transactions</div>
+    <div class="transactions-list" id="transactionsList">
+        <p style="text-align:center;color:var(--muted);">Loading transactions...</p>
+    </div>
+</div>
+
+<!-- DEPOSIT MODAL -->
+<div class="overlay" id="depositModal">
+    <div class="modal">
+        <h3>Deposit Money</h3>
+        <label>Amount (₦)</label>
+        <input type="number" id="depositAmount" placeholder="Enter amount" min="1" step="0.01">
+        <div class="error-message" id="depositError"></div>
+        <div class="modal-actions">
+            <button onclick="processDeposit()">Confirm Deposit</button>
+            <button class="secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="overlay" id="withdrawModal">
+    <div class="modal">
+        <h3>Withdraw Money</h3>
+        <label>Amount (₦)</label>
+        <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1" step="0.01">
+        <div class="error-message" id="withdrawError"></div>
+        <div class="modal-actions">
+            <button onclick="processWithdraw()">Confirm Withdrawal</button>
+            <button class="secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- TRANSFER MODAL -->
+<div class="overlay" id="transferModal">
+    <div class="modal">
+        <h3>Transfer Money</h3>
+        <label>To Account Number</label>
+        <input type="text" id="transferToAccount" placeholder="ACC1234567890">
+        <label>Amount (₦)</label>
+        <input type="number" id="transferAmount" placeholder="Enter amount" min="1" step="0.01">
+        <div class="error-message" id="transferError"></div>
+        <div class="modal-actions">
+            <button onclick="processTransfer()">Transfer</button>
+            <button class="secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- CREATE ACCOUNT MODAL -->
+<div class="overlay" id="createAccountModal">
+    <div class="modal">
+        <h3>Open New Account</h3>
+        <label>Account Type</label>
+        <select id="newAccountType">
+            <option value="Savings">Savings Account</option>
+            <option value="Current">Current Account</option>
+        </select>
+        <label>Initial Deposit (₦)</label>
+        <input type="number" id="initialDeposit" placeholder="Minimum ₦0" min="0" step="0.01" value="0">
+        <div class="error-message" id="createAccountError"></div>
+        <div class="modal-actions">
+            <button onclick="createAccount()">Create Account</button>
+            <button class="secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="successModal">
+    <div class="modal success-modal">
+        <div class="success-icon" id="successIcon">✓</div>
+        <h3 id="successTitle">Success!</h3>
+        <p id="successMessage"></p>
+        <button onclick="closeModal()" style="margin-top:16px;">Close</button>
+    </div>
+</div>
+
+<script>
+const API_BASE_URL = 'http://localhost:5000/api';
+let currentAccount = null;
+let accounts = [];
+
+// Helper Functions
+const getToken = () => localStorage.getItem('authToken');
+const getCustomer = () => JSON.parse(localStorage.getItem('customer') || '{}');
+
+const apiCall = async (endpoint, method = 'GET', body = null) => {
+    const config = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        }
+    };
+    if (body) config.body = JSON.stringify(body);
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const data = await response.json();
+    
+    if (!response.ok) throw new Error(data.message || 'Request failed');
+    return data;
+};
+
+const fmt = (n) => '₦' + parseFloat(n).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+// Initialize
+window.addEventListener('DOMContentLoaded', async () => {
+    const token = getToken();
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    const customer = getCustomer();
+    
+    // Redirect admins to admin dashboard
+    if (customer.userRole === 'BankAdmin') {
+        window.location.href = 'admin.html';
+        return;
+    }
+    
+    // Redirect tellers to teller dashboard
+    if (customer.userRole === 'Teller') {
+        window.location.href = 'teller.html';
+        return;
+    }
+    
+    // Redirect auditors to auditor dashboard
+    if (customer.userRole === 'Auditor') {
+        window.location.href = 'auditor.html';
+        return;
+    }
+    
+    document.getElementById('userName').textContent = customer.firstName || 'User';
+    
+    await loadAccounts();
+    await loadTransactions();
+});
+
+// Load Accounts
+async function loadAccounts() {
+    try {
+        const data = await apiCall('/accounts');
+        accounts = data.accounts;
+        
+        const selector = document.getElementById('accountSelector');
+        selector.innerHTML = '<option value="">Select Account</option>';
+        
+        accounts.forEach(acc => {
+            const option = document.createElement('option');
+            option.value = acc.AccountNumber;
+            option.textContent = `${acc.AccountType} - ${acc.AccountNumber}`;
+            selector.appendChild(option);
+        });
+        
+        if (accounts.length > 0) {
+            currentAccount = accounts[0];
+            selector.value = currentAccount.AccountNumber;
+            updateBalance();
+        }
+    } catch (error) {
+        console.error('Error loading accounts:', error);
+        if (error.message.includes('Token')) {
+            logout();
+        }
+    }
+}
+
+// Switch Account
+function switchAccount() {
+    const selector = document.getElementById('accountSelector');
+    const accountNumber = selector.value;
+    currentAccount = accounts.find(acc => acc.AccountNumber === accountNumber);
+    if (currentAccount) {
+        updateBalance();
+    }
+}
+
+// Update Balance Display
+function updateBalance() {
+    if (currentAccount) {
+        document.getElementById('balance').textContent = fmt(currentAccount.Balance);
+        document.getElementById('accountType').textContent = currentAccount.AccountType + ' Account';
+    }
+}
+
+// Load Transactions
+async function loadTransactions() {
+    try {
+        const data = await apiCall('/transactions/recent');
+        const list = document.getElementById('transactionsList');
+        
+        if (data.transactions.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:var(--muted);">No transactions yet</p>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        data.transactions.slice(0, 10).forEach(txn => {
+            const div = document.createElement('div');
+            div.className = 'transaction-item';
+            
+            let iconClass = 'deposit';
+            let icon = '💰';
+            let amountClass = 'positive';
+            let sign = '+';
+            let type = txn.TransactionType;
+            
+            if (txn.TransactionType === 'Withdrawal') {
+                iconClass = 'withdrawal';
+                icon = '💸';
+                amountClass = 'negative';
+                sign = '-';
+            } else if (txn.TransactionType === 'Transfer') {
+                iconClass = 'transfer';
+                icon = '🔄';
+                // Check if this is outgoing or incoming
+                if (currentAccount && txn.FromAccount === currentAccount.AccountNumber) {
+                    amountClass = 'negative';
+                    sign = '-';
+                    type = 'Transfer Out';
+                } else {
+                    amountClass = 'positive';
+                    sign = '+';
+                    type = 'Transfer In';
+                }
+            }
+            
+            const date = new Date(txn.TransactionDate).toLocaleDateString();
+            
+            div.innerHTML = `
+                <div class="transaction-info">
+                    <div class="transaction-icon ${iconClass}">${icon}</div>
+                    <div class="transaction-details">
+                        <h4>${type}</h4>
+                        <p>${date}</p>
+                    </div>
+                </div>
+                <div class="transaction-amount ${amountClass}">${sign}${fmt(txn.Amount)}</div>
+            `;
+            list.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Error loading transactions:', error);
+    }
+}
+
+// Modal Functions
+function openModal(type) {
+    closeModal();
+    
+    if (!currentAccount && type !== 'createAccount') {
+        showMessage('Please select an account first', false);
+        return;
+    }
+    
+    const modalId = type + 'Modal';
+    document.getElementById(modalId).classList.add('active');
+}
+
+function closeModal() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+    // Clear error messages
+    document.querySelectorAll('.error-message').forEach(e => e.textContent = '');
+    // Clear inputs
+    document.querySelectorAll('input[type="number"]').forEach(i => i.value = '');
+    document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+}
+
+function showMessage(message, isSuccess = true, title = null) {
+    const icon = document.getElementById('successIcon');
+    icon.textContent = isSuccess ? '✓' : '✗';
+    icon.className = 'success-icon ' + (isSuccess ? 'success' : 'error');
+    
+    document.getElementById('successTitle').textContent = title || (isSuccess ? 'Success!' : 'Error');
+    document.getElementById('successMessage').textContent = message;
+    document.getElementById('successModal').classList.add('active');
+}
+
+// Deposit
+async function processDeposit() {
+    const amount = parseFloat(document.getElementById('depositAmount').value);
+    const errorEl = document.getElementById('depositError');
+    
+    errorEl.textContent = '';
+    
+    if (!amount || amount <= 0) {
+        errorEl.textContent = 'Please enter a valid amount';
+        return;
+    }
+    
+    try {
+        const data = await apiCall('/transactions/deposit', 'POST', {
+            accountNumber: currentAccount.AccountNumber,
+            amount
+        });
+        
+        currentAccount.Balance = data.newBalance;
+        updateBalance();
+        await loadTransactions();
+        closeModal();
+        showMessage(`Successfully deposited ${fmt(amount)}`);
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// Withdraw
+async function processWithdraw() {
+    const amount = parseFloat(document.getElementById('withdrawAmount').value);
+    const errorEl = document.getElementById('withdrawError');
+    
+    errorEl.textContent = '';
+    
+    if (!amount || amount <= 0) {
+        errorEl.textContent = 'Please enter a valid amount';
+        return;
+    }
+    
+    if (amount > currentAccount.Balance) {
+        errorEl.textContent = 'Insufficient funds';
+        return;
+    }
+    
+    try {
+        const data = await apiCall('/transactions/withdraw', 'POST', {
+            accountNumber: currentAccount.AccountNumber,
+            amount
+        });
+        
+        currentAccount.Balance = data.newBalance;
+        updateBalance();
+        await loadTransactions();
+        closeModal();
+        showMessage(`Successfully withdrew ${fmt(amount)}`);
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// Transfer
+async function processTransfer() {
+    const toAccount = document.getElementById('transferToAccount').value.trim();
+    const amount = parseFloat(document.getElementById('transferAmount').value);
+    const errorEl = document.getElementById('transferError');
+    
+    errorEl.textContent = '';
+    
+    if (!toAccount) {
+        errorEl.textContent = 'Please enter destination account number';
+        return;
+    }
+    
+    if (!amount || amount <= 0) {
+        errorEl.textContent = 'Please enter a valid amount';
+        return;
+    }
+    
+    if (amount > currentAccount.Balance) {
+        errorEl.textContent = 'Insufficient funds';
+        return;
+    }
+    
+    if (toAccount === currentAccount.AccountNumber) {
+        errorEl.textContent = 'Cannot transfer to the same account';
+        return;
+    }
+    
+    try {
+        const data = await apiCall('/transactions/transfer', 'POST', {
+            fromAccountNumber: currentAccount.AccountNumber,
+            toAccountNumber: toAccount,
+            amount
+        });
+        
+        currentAccount.Balance = data.newBalance;
+        updateBalance();
+        await loadTransactions();
+        closeModal();
+        showMessage(`Successfully transferred ${fmt(amount)} to ${toAccount}`);
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// Create Account
+async function createAccount() {
+    const accountType = document.getElementById('newAccountType').value;
+    const initialDeposit = parseFloat(document.getElementById('initialDeposit').value) || 0;
+    const errorEl = document.getElementById('createAccountError');
+    
+    errorEl.textContent = '';
+    
+    try {
+        const data = await apiCall('/accounts', 'POST', {
+            accountType,
+            initialDeposit
+        });
+        
+        await loadAccounts();
+        closeModal();
+        showMessage(`New ${accountType} account created successfully! Account Number: ${data.accountNumber}`);
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// Logout
+function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+}
+</script>
+
+</body>
+</html>

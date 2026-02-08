@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - Banking System</title>
+
+<style>
+:root {
+    --bg: #0b0f1a;
+    --card: #11162a;
+    --blue: #1f6fff;
+    --blue-soft: #2a86ff;
+    --text: #e6ebff;
+    --muted: #8b93b8;
+    --error: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 32px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+
+.tabs {
+    display: flex;
+    background: #0c1228;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 10px;
+    color: var(--muted);
+    transition: all 0.3s;
+}
+
+.tab.active {
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    color: white;
+    font-weight: 600;
+}
+
+form {
+    display: none;
+}
+
+form.active {
+    display: block;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #1e2547;
+    background: #0c1228;
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 18px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--error);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.footer-text {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 24px;
+}
+
+.optional {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Welcome Back</h1>
+    <div class="subtitle">Access your banking dashboard</div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">Login</div>
+        <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="login" class="active" onsubmit="handleLogin(event)">
+        <div class="error-message" id="loginError"></div>
+        
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="you@example.com" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+
+        <button type="submit" id="loginBtn">
+            <span>Login</span>
+        </button>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signup" onsubmit="handleSignup(event)">
+        <div class="error-message" id="signupError"></div>
+        
+        <label>First Name</label>
+        <input type="text" name="firstName" placeholder="John" required>
+
+        <label>Last Name</label>
+        <input type="text" name="lastName" placeholder="Doe" required>
+
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="you@example.com" required>
+
+        <label>Phone Number <span class="optional">(Optional)</span></label>
+        <input type="tel" name="phone" placeholder="+234 800 000 0000">
+
+        <label>Address <span class="optional">(Optional)</span></label>
+        <input type="text" name="address" placeholder="123 Main Street, Lagos">
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Min. 6 characters" minlength="6" required>
+
+        <button type="submit" id="signupBtn">
+            <span>Create Account</span>
+        </button>
+    </form>
+
+    <div class="footer-text">
+        Protected by industry-standard encryption
+    </div>
+</div>
+
+<script>
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// Tab Switching
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('form').forEach(f => f.classList.remove('active'));
+    
+    document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+    document.getElementById(tab).classList.add('active');
+    
+    // Clear errors
+    document.querySelectorAll('.error-message').forEach(e => {
+        e.classList.remove('show');
+        e.textContent = '';
+    });
+}
+
+// Show Error
+function showError(formId, message) {
+    const errorEl = document.getElementById(formId + 'Error');
+    errorEl.textContent = message;
+    errorEl.classList.add('show');
+}
+
+// Hide Error
+function hideError(formId) {
+    const errorEl = document.getElementById(formId + 'Error');
+    errorEl.classList.remove('show');
+    errorEl.textContent = '';
+}
+
+// Set Loading State
+function setLoading(btnId, isLoading) {
+    const btn = document.getElementById(btnId);
+    const span = btn.querySelector('span');
+    
+    if (isLoading) {
+        btn.disabled = true;
+        span.textContent = '';
+        btn.innerHTML = '<div class="loading"></div><span>Processing...</span>';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = '<span>' + (btnId === 'loginBtn' ? 'Login' : 'Create Account') + '</span>';
+    }
+}
+
+// Handle Login
+async function handleLogin(event) {
+    event.preventDefault();
+    hideError('login');
+    
+    const form = event.target;
+    const email = form.email.value.trim();
+    const password = form.password.value;
+    
+    setLoading('loginBtn', true);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+        
+        if (data.success && data.token) {
+            // Store token and customer data
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('customer', JSON.stringify(data.customer));
+            
+            // Redirect to dashboard
+            window.location.href = 'index.html';
+        } else {
+            throw new Error('Login failed. Please try again.');
+        }
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('login', error.message);
+        setLoading('loginBtn', false);
+    }
+}
+
+// Handle Signup
+async function handleSignup(event) {
+    event.preventDefault();
+    hideError('signup');
+    
+    const form = event.target;
+    const firstName = form.firstName.value.trim();
+    const lastName = form.lastName.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+    const address = form.address.value.trim();
+    const password = form.password.value;
+    
+    setLoading('signupBtn', true);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                phone,
+                address,
+                password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            if (data.errors && data.errors.length > 0) {
+                throw new Error(data.errors[0].msg);
+            }
+            throw new Error(data.message || 'Signup failed');
+        }
+        
+        if (data.success && data.token) {
+            // Store token and customer data
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('customer', JSON.stringify(data.customer));
+            
+            // Redirect to dashboard
+            window.location.href = 'index.html';
+        } else {
+            throw new Error('Signup failed. Please try again.');
+        }
+        
+    } catch (error) {
+        console.error('Signup error:', error);
+        showError('signup', error.message);
+        setLoading('signupBtn', false);
+    }
+}
+
+// Check if already logged in
+window.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        // Verify token is still valid by trying to access a protected route
+        fetch(`${API_BASE_URL}/accounts`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => {
+            if (res.ok) {
+                window.location.href = 'index.html';
+            }
+        })
+        .catch(() => {
+            // Token invalid, clear storage
+            localStorage.clear();
+        });
+    }
+});
+</script>
+
+</body>
+</html>

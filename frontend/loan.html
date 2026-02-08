@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Loan Management</title>
+
+<style>
+:root {
+    --bg: #0b0f1a;
+    --card: #11162a;
+    --blue: #1f6fff;
+    --blue-soft: #2a86ff;
+    --text: #e6ebff;
+    --muted: #8b93b8;
+    --success: #22c55e;
+    --error: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.back-btn {
+    padding: 10px 20px;
+    background: #1a2145;
+    border: none;
+    border-radius: 12px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.back-btn:hover {
+    background: #252d50;
+}
+
+.tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.tab {
+    padding: 12px 24px;
+    background: var(--card);
+    border: none;
+    border-radius: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tab.active {
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    margin-bottom: 24px;
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+}
+
+h2 {
+    margin: 0 0 20px;
+    font-size: 20px;
+}
+
+.subtitle {
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #1e2547;
+    background: #0c1228;
+    color: var(--text);
+    font-size: 15px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.95;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.summary-box {
+    background: #0c1228;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.summary-box span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.summary-box strong {
+    font-size: 20px;
+    margin-top: 4px;
+    display: block;
+}
+
+table {
+    width: 100%;
+    margin-top: 32px;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: right;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 12px 8px;
+    border-bottom: 1px solid #1e2547;
+}
+
+td {
+    padding: 10px 8px;
+    text-align: right;
+    border-bottom: 1px solid #161c3b;
+    font-size: 14px;
+}
+
+th:first-child,
+td:first-child {
+    text-align: left;
+}
+
+.loan-card {
+    background: #0c1228;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid #1e2547;
+}
+
+.loan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.loan-id {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.loan-status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.loan-status.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+}
+
+.loan-status.paid {
+    background: rgba(31, 111, 255, 0.1);
+    color: var(--blue-soft);
+}
+
+.loan-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.loan-detail {
+    font-size: 13px;
+}
+
+.loan-detail span {
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.loan-detail strong {
+    font-size: 16px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #1a2145;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+    transition: width 0.3s;
+}
+
+.loan-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.loan-actions button {
+    margin-top: 0;
+    flex: 1;
+    padding: 12px;
+}
+
+.error-message {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Loan Management</h1>
+        <a href="index.html" class="back-btn">← Back to Dashboard</a>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('simulator')">Loan Simulator</button>
+        <button class="tab" onclick="switchTab('apply')">Apply for Loan</button>
+        <button class="tab" onclick="switchTab('myloans')">My Loans</button>
+    </div>
+
+    <!-- LOAN SIMULATOR TAB -->
+    <div id="simulator" class="tab-content active">
+        <div class="card">
+            <h2>Loan Calculator</h2>
+            <div class="subtitle">Calculate your monthly payments before applying</div>
+
+            <div class="grid">
+                <div>
+                    <label>Loan Amount (₦)</label>
+                    <input type="number" id="simAmount" min="1" placeholder="100,000">
+                </div>
+                <div>
+                    <label>Interest Rate (% yearly)</label>
+                    <input type="number" id="simRate" min="0.01" step="0.01" placeholder="5.5">
+                </div>
+                <div>
+                    <label>Duration (months)</label>
+                    <input type="number" id="simMonths" min="1" placeholder="12">
+                </div>
+            </div>
+
+            <button onclick="simulateLoan()">Calculate Loan</button>
+
+            <div id="simSummary" class="summary" style="display:none;"></div>
+
+            <table id="simTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Payment</th>
+                        <th>Principal</th>
+                        <th>Interest</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- APPLY FOR LOAN TAB -->
+    <div id="apply" class="tab-content">
+        <div class="card">
+            <h2>Apply for a Loan</h2>
+            <div class="subtitle">Get instant approval for your loan application</div>
+
+            <div class="grid">
+                <div>
+                    <label>Loan Amount (₦)</label>
+                    <input type="number" id="applyAmount" min="1" placeholder="100,000">
+                </div>
+                <div>
+                    <label>Interest Rate (% yearly)</label>
+                    <input type="number" id="applyRate" min="0.01" step="0.01" placeholder="5.5">
+                </div>
+                <div>
+                    <label>Duration (months)</label>
+                    <input type="number" id="applyMonths" min="1" placeholder="12">
+                </div>
+            </div>
+
+            <div class="error-message" id="applyError"></div>
+
+            <button onclick="applyForLoan()">Submit Application</button>
+        </div>
+    </div>
+
+    <!-- MY LOANS TAB -->
+    <div id="myloans" class="tab-content">
+        <div class="card">
+            <h2>My Loans</h2>
+            <div class="subtitle">Manage your active and completed loans</div>
+
+            <div id="loansList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💳</div>
+                    <p>Loading your loans...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REPAYMENT MODAL -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:100;" id="repayModal">
+    <div class="card" style="max-width:400px;margin:0;">
+        <h2>Make Loan Payment</h2>
+        <div class="subtitle" id="repayInfo"></div>
+        
+        <label>Payment Amount (₦)</label>
+        <input type="number" id="repayAmount" min="1" step="0.01" placeholder="Enter amount">
+        
+        <div class="error-message" id="repayError"></div>
+        
+        <div style="display:flex;gap:10px;">
+            <button onclick="processRepayment()">Pay Now</button>
+            <button onclick="closeRepayModal()" style="background:#1a2145;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_BASE_URL = 'http://localhost:5000/api';
+let currentLoanId = null;
+let loans = [];
+
+const getToken = () => localStorage.getItem('authToken');
+
+const apiCall = async (endpoint, method = 'GET', body = null, requiresAuth = true) => {
+    const config = { method, headers: { 'Content-Type': 'application/json' } };
+    if (requiresAuth) config.headers['Authorization'] = `Bearer ${getToken()}`;
+    if (body) config.body = JSON.stringify(body);
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const data = await response.json();
+    
+    if (!response.ok) throw new Error(data.message || 'Request failed');
+    return data;
+};
+
+const fmt = (n) => '₦' + parseFloat(n).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+// Check authentication
+window.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+    loadMyLoans();
+});
+
+// Tab Switching
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+    document.getElementById(tab).classList.add('active');
+    
+    if (tab === 'myloans') {
+        loadMyLoans();
+    }
+}
+
+// Simulate Loan
+async function simulateLoan() {
+    const amount = parseFloat(document.getElementById('simAmount').value);
+    const rate = parseFloat(document.getElementById('simRate').value);
+    const months = parseInt(document.getElementById('simMonths').value);
+
+    if (!amount || !rate || !months) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    try {
+        const data = await apiCall('/loans/simulate', 'POST', {
+            loanAmount: amount,
+            interestRate: rate,
+            durationMonths: months
+        }, false);
+
+        const { summary, schedule } = data;
+
+        // Display summary
+        document.getElementById('simSummary').innerHTML = `
+            <div class="summary-box">
+                <span>Monthly Payment</span>
+                <strong>${fmt(summary.monthlyPayment)}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Total Interest</span>
+                <strong>${fmt(summary.totalInterest)}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Total Repayment</span>
+                <strong>${fmt(summary.totalRepayment)}</strong>
+            </div>
+        `;
+        document.getElementById('simSummary').style.display = 'grid';
+
+        // Display schedule
+        const tbody = document.querySelector('#simTable tbody');
+        tbody.innerHTML = '';
+        
+        schedule.forEach(row => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${row.month}</td>
+                    <td>${fmt(row.payment)}</td>
+                    <td>${fmt(row.principal)}</td>
+                    <td>${fmt(row.interest)}</td>
+                    <td>${fmt(row.balance)}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('simTable').style.display = 'table';
+
+    } catch (error) {
+        alert('Simulation failed: ' + error.message);
+    }
+}
+
+// Apply for Loan
+async function applyForLoan() {
+    const amount = parseFloat(document.getElementById('applyAmount').value);
+    const rate = parseFloat(document.getElementById('applyRate').value);
+    const months = parseInt(document.getElementById('applyMonths').value);
+    const errorEl = document.getElementById('applyError');
+
+    errorEl.textContent = '';
+
+    if (!amount || !rate || !months) {
+        errorEl.textContent = 'Please fill in all fields';
+        return;
+    }
+
+    try {
+        const data = await apiCall('/loans', 'POST', {
+            loanAmount: amount,
+            interestRate: rate,
+            durationMonths: months
+        });
+
+        alert('Loan application successful! Loan ID: ' + data.loan.LoanID);
+        
+        // Switch to My Loans tab
+        switchTab('myloans');
+        
+        // Clear form
+        document.getElementById('applyAmount').value = '';
+        document.getElementById('applyRate').value = '';
+        document.getElementById('applyMonths').value = '';
+
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// Load My Loans
+async function loadMyLoans() {
+    const container = document.getElementById('loansList');
+    
+    try {
+        const data = await apiCall('/loans');
+        loans = data.loans;
+
+        if (loans.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">💳</div>
+                    <p>You don't have any loans yet</p>
+                    <button onclick="switchTab('apply')" style="max-width:200px;margin:16px auto 0;">Apply for Loan</button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = '';
+        loans.forEach(loan => {
+            const progress = (loan.TotalPaid / loan.TotalRepayment) * 100;
+            const isPaid = loan.RemainingBalance <= 0;
+            
+            const div = document.createElement('div');
+            div.className = 'loan-card';
+            div.innerHTML = `
+                <div class="loan-header">
+                    <div class="loan-id">Loan #${loan.LoanID}</div>
+                    <div class="loan-status ${isPaid ? 'paid' : 'active'}">
+                        ${isPaid ? 'Fully Paid' : 'Active'}
+                    </div>
+                </div>
+                
+                <div class="loan-details">
+                    <div class="loan-detail">
+                        <span>Loan Amount</span>
+                        <strong>${fmt(loan.LoanAmount)}</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Interest Rate</span>
+                        <strong>${loan.InterestRate}%</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Duration</span>
+                        <strong>${loan.DurationMonths} months</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Monthly Payment</span>
+                        <strong>${fmt(loan.MonthlyPayment)}</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Total Repayment</span>
+                        <strong>${fmt(loan.TotalRepayment)}</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Total Paid</span>
+                        <strong>${fmt(loan.TotalPaid)}</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Remaining</span>
+                        <strong>${fmt(loan.RemainingBalance)}</strong>
+                    </div>
+                    <div class="loan-detail">
+                        <span>Start Date</span>
+                        <strong>${new Date(loan.StartDate).toLocaleDateString()}</strong>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:${progress}%"></div>
+                </div>
+                
+                ${!isPaid ? `
+                    <div class="loan-actions">
+                        <button onclick="openRepayModal(${loan.LoanID}, ${loan.RemainingBalance})">Make Payment</button>
+                        <button onclick="viewLoanDetails(${loan.LoanID})" style="background:#1a2145;">View Details</button>
+                    </div>
+                ` : ''}
+            `;
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <p>Error loading loans: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Open Repayment Modal
+function openRepayModal(loanId, remaining) {
+    currentLoanId = loanId;
+    document.getElementById('repayInfo').textContent = `Remaining Balance: ${fmt(remaining)}`;
+    document.getElementById('repayAmount').value = '';
+    document.getElementById('repayError').textContent = '';
+    document.getElementById('repayModal').style.display = 'flex';
+}
+
+// Close Repayment Modal
+function closeRepayModal() {
+    document.getElementById('repayModal').style.display = 'none';
+    currentLoanId = null;
+}
+
+// Process Repayment
+async function processRepayment() {
+    const amount = parseFloat(document.getElementById('repayAmount').value);
+    const errorEl = document.getElementById('repayError');
+
+    errorEl.textContent = '';
+
+    if (!amount || amount <= 0) {
+        errorEl.textContent = 'Please enter a valid amount';
+        return;
+    }
+
+    try {
+        const data = await apiCall(`/loans/${currentLoanId}/repay`, 'POST', { amount });
+
+        alert(`Payment successful! Remaining balance: ${fmt(data.remainingBalance)}`);
+        closeRepayModal();
+        loadMyLoans();
+
+    } catch (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+// View Loan Details
+async function viewLoanDetails(loanId) {
+    try {
+        const data = await apiCall(`/loans/${loanId}`);
+        const loan = data.loan;
+
+        let details = `Loan #${loan.LoanID}\n\n`;
+        details += `Loan Amount: ${fmt(loan.LoanAmount)}\n`;
+        details += `Interest Rate: ${loan.InterestRate}%\n`;
+        details += `Duration: ${loan.DurationMonths} months\n`;
+        details += `Monthly Payment: ${fmt(loan.monthlyPayment)}\n`;
+        details += `Total Repayment: ${fmt(loan.totalRepayment)}\n`;
+        details += `Start Date: ${new Date(loan.StartDate).toLocaleDateString()}\n\n`;
+        details += `Total Paid: ${fmt(loan.totalPaid)}\n`;
+        details += `Remaining: ${fmt(loan.remainingBalance)}\n\n`;
+
+        if (loan.repayments.length > 0) {
+            details += 'Payment History:\n';
+            loan.repayments.forEach(rep => {
+                details += `- ${new Date(rep.PaymentDate).toLocaleDateString()}: ${fmt(rep.AmountPaid)}\n`;
+            });
+        }
+
+        alert(details);
+
+    } catch (error) {
+        alert('Error loading loan details: ' + error.message);
+    }
+}
+</script>
+
+</body>
+</html>
